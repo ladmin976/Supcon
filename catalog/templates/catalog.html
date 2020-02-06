@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} {{cat.name}} {% endblock title %} 
+{% block leftmenu %}
+<div id="leftmenu">
+    <ul>
+        {% for cat in cats %}
+        <li><a href="{% url 'categories:category' cat.no  %}">{{cat.name}}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock leftmenu %}
+{% block main %}
+    <div id="main">
+        <h2>{{good.name}}</h2>
+            <table>
+                <tr>
+                    <th>Наименование</th>
+                    <td>{{good.name}}</td>
+                </tr>
+            </table>
+    </div>
+{% endblock main %}

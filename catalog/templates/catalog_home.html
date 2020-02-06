@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block leftmenu %}
+        <div class="scrollbar-sidebar" >
+            <div class="app-sidebar__inner">
+                <ul  class="vertical-nav-menu"> 
+                    <li  class="app-sidebar__heading"> Каталог </li>
+                      {% for cat in cats %}
+                    {% if cat.no == view.kwargs.cat %}  
+                    <li class="mm-active"> 
+                    {% else %} 
+                    <li>
+                    {% endif %} 
+                        <a href="{% url 'catalog:category' cat.no %}"> 
+                            <i class="metismenu-icon pe-7s-diamond"></i>
+                            {{cat.name}}
+                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                        </a>
+                        <ul> 
+                            {% for c in cat.CAT.all %}
+                            {% if c.no == view.kwargs.scat1 %}  
+                             <li  class="mm-active">
+                             {% else %} 
+                             <li>
+                             {% endif %} 
+                                <a href="{% url 'catalog:scat1' c.no %}">
+                                    <i class="metismenu-icon"></i>
+                                    {{c.name}}
+                                    <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                </a>
+                                <ul> 
+                                    {% for cc in c.SC1.all %}
+                                     {% if cc.no == view.kwargs.scat2 %}  
+                                     <li  class="mm-active">
+                                     {% else %} 
+                                     <li>
+                                     {% endif %}
+                                        <a href="{% url 'catalog:scat2' cc.no %}">
+                                            <i class="metismenu-icon"></i>
+                                            {{cc.name}}
+                                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                                        </a>
+                                        <ul> 
+                                            {% for ccc in cc.SC2.all %}
+                                            {% if ccc.no == view.kwargs.scat3 %}  
+                                            <li  class="mm-active">
+                                             {% else %} 
+                                             <li>
+                                             {% endif %}
+                                                <a href="{% url 'catalog:scat3' ccc.no %}">
+                                                    <i class="metismenu-icon"></i>
+                                                    {{ccc.name}}
+                                                </a>
+                                            </li>
+                                            {% empty %}
+                                                 нет подкатегорий
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                    {% empty %}
+                                         нет подкатегорий
+                                    {% endfor %}
+                                </ul>    
+                            </li >
+                            {% empty %}
+                                 нет подкатегорий
+                            {% endfor %}
+                        </ul>    
+                    </li>
+                    {% empty %}
+                        нет подкатегорий
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+{% endblock leftmenu%}
+
+{% block pageheading%}
+
+<div>Автоматика
+    <div class="page-title-subheading">    
+    </div>
+</div>
+{% endblock pageheading %}
+
+{% block maintable %}
+<div class="main-card mb-3 card">
+    <div class="card-body"><h5 class="card-title">Номенклатура</h5>
+        <div class="table-responsive">
+            <table class="mb-0 table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th> Наименование</th>
+                    <th>Зав. №</th>
+                    <th>Производитель</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                 {% for good in object_list %}
+                <tr>
+                    <td>
+                        <div class="custom-control custom-checkbox">
+                           <input type="checkbox" class="custom-control-input" id="customCheck{{good.no}}" unchecked>
+                           <label class="custom-control-label" for="customCheck{{good.no}}">{{good.no}}</label>
+                        </div>
+                    </td>
+                    {% if good.subcategory3_id != None %}
+                       <td><a href= "{% url 'catalog:scat3_good' scat3=good.subcategory3_id  no=good.no %}">{{good.name}} </a></td>
+                    {% elif good.subcategory2_id != None %}
+                        <td><a href= "{% url 'catalog:scat2_good' scat2=good.subcategory2_id  no=good.no %}">{{good.name}} </a></td>
+                    {% elif good.subcategory1_id != None %}
+                        <td><a href= "{% url 'catalog:scat1_good' scat1=good.subcategory1_id  no=good.no %}">{{good.name}} </a></td>
+                    {% elif good.good_category_id != None %}
+                        <td><a href= "{% url 'catalog:category_good' cat=good.good_category_id  no=good.no %}">{{good.name}} </a></td>
+                    {% endif %}
+                    <td>{{good.part_no}}</td>
+                    <td><a href= "#">{{good.producer}} </a></td>
+                    <td>{{good.description}}</td>
+                </tr>
+                {% endfor %}  
+            </tbody>    
+            </table>
+        </div>
+    </div>
+</div>
+<!--Paginator-----------------------------------------------------------> 
+{% if paginator.num_pages > 1%}
+<div class="main-card mb-3 card">
+    <div class="card-body">
+        <nav class="" aria-label="Page navigation example">
+            <ul class="pagination">
+                {% if page_obj.has_previous%}
+                    <li class="page-item"><a href="{% url 'catalog:good' good.no%}?page={{page_obj.previous_page_number}}" class="page-link" aria-label="Previous"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+                {% endif%}
+                {% for pn in paginator.page_range%}
+                    {% if page_obj.number == pn%}
+                        <li class="page-item active"><a href="javascript:void(0);" class="page-link">{{pn}}</a></li>
+                    {% else%}
+                     <li class="page-item "><a href="{% url 'catalog:good' good.no %}?page={{pn}}" class="page-link">{{pn}}</a></li>
+                    {%endif%}
+                {%endfor%}
+                
+                {% if page_obj.has_next%}
+                <li class="page-item"><a href="{% url 'catalog:good' good.no%}?page={{page_obj.next_page_number}}" class="page-link" aria-label="Next"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+                {% endif%}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif%}
+{% endblock maintable %}
+
+<!-- Подробные данные по записи-->
+{% block detailview %}
+<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+    <li class="nav-item">
+        <a role="tab" class="nav-link active" id="tab-0" data-toggle="tab" href="#tab-content-0">
+             <span>Основные</span>
+         </a>
+    </li>
+    <li class="nav-item">
+        <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
+             <span>Характеристики</span>
+         </a>
+    </li>
+    <li class="nav-item">
+         <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
+             <span>Цены</span>
+         </a>
+    </li>
+    <li class="nav-item">
+         <a role="tab" class="nav-link" id="tab-3" data-toggle="tab" href="#tab-content-3">
+             <span>Тех. параметры</span>
+         </a>
+     </li>
+     <li class="nav-item">
+        <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#tab-content-4">
+            <span>Дополнительно</span>
+        </a>
+    </li>
+ </ul>
+
+
+
+ 
+<form class="" action ="" method="post" > 
+    {% csrf_token %} 
+
+
+<div class="tab-content">
+
+    <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                            <div class="position-relative form-group"><label for="name" class="">{{ form.name.label }}</label> {{ form.name }}</div>
+                            <div class="position-relative form-group"><label for="part_no" class="">{{ form.part_no.label }}</label> {{ form.part_no }}</div>
+                            <div class="position-relative form-group"><label for="description" class="">{{ form.description.label }}</label> {{ form.description }}</div>
+                            <div class="position-relative form-group"><label for="producer" class="">{{ form.producer.label }}</label> {{ form.producer }}</div>
+                            <div class="position-relative form-group"><label for="price" class="">{{ form.rrp_price_w_vat.label }}</label> {{ form.rrp_price_w_vat }}</div>
+                            <button class="mt-1 btn btn-primary" input type="submit">Записать</button>
+                            <button class="mt-1 btn btn-success" >Создать</button>                        
+                            <button class="mt-1 btn btn-danger"  input type="button" data-toggle="modal" data-target="#deletemodal">Удалить</button>      
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                           <div class="position-relative form-group"><label for="category" class="">{{ form.good_category.label }}</label> {{ form.good_category }}</div>
+                           <div class="position-relative form-group"><label for="part_no" class="">{{ form.subcategory1.label }}</label> {{ form.subcategory1}}</div>
+                           <div class="position-relative form-group"><label for="description" class="">{{ form.subcategory2.label }}</label> {{ form.subcategory2 }}</div>
+                           <div class="position-relative form-group"><label for="producer" class="">{{ form.subcategory3.label }}</label> {{ form.subcategory3 }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.good_family.label }}</label> {{ form.good_family }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.subfamily.label }}</label> {{ form.subfamily }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.suplayer.label }}</label> {{ form.suplayer }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.delivery_time.label }}</label> {{ form.delivery_time }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.installation_time.label }}</label> {{ form.installation_time }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.programming_time.label }}</label> {{ form.programming_time }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.comission_time.label }}</label> {{ form.comission_time  }}</div>
+                           <div class="position-relative form-group"><label for="price" class="">{{ form.in_stock.label }}</label> {{ form.in_stock }}</div>
+                          
+                        
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+    
+</form>
+{% endblock detailview %}
+
+
+{% block modals %}
+<!--Delete confirmation window-----------------------------------------------------------> 
+<div class="modal fade bd-example-modal-sm" tabindex="-1" id = "deletemodal" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Удаление</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Вы действительно хотите удалить?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <a href="{% url 'catalog:good_delete' object.no %}" class="mt-1 btn btn-danger" input type="submit">Удалить</a>
+            </div>
+        </div>
+       
+    </div>
+</div>
+<!---Модальное окно отсутствия данных-->
+<div class="modal fade bd-example-modal-sm" tabindex="-1" id = "notexistsmodal" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Внимание</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Нет данных по запросу</p>
+            </div>
+            <div class="modal-footer">
+                <input type="button"class="btn btn-secondary" onclick="history.back();" value="Ок"/>
+            </div>
+        </div>
+       
+    </div>
+</div>
+<!---Если в запросе нет данных показывает модальное окно-->
+
+{% if notexists %}
+<script type="text/javascript">
+  alert('Нет данных по запросу')
+  window.history.back
+
+  $("#notexistsmodal").modal('show');
+</script>
+{% endif %}
+{% endblock modals %}
