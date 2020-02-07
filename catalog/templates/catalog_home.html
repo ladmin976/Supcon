@@ -202,9 +202,7 @@
                             <div class="position-relative form-group"><label for="description" class="">{{ form.description.label }}</label> {{ form.description }}</div>
                             <div class="position-relative form-group"><label for="producer" class="">{{ form.producer.label }}</label> {{ form.producer }}</div>
                             <div class="position-relative form-group"><label for="price" class="">{{ form.rrp_price_w_vat.label }}</label> {{ form.rrp_price_w_vat }}</div>
-                            <button class="mt-1 btn btn-primary" input type="submit">Записать</button>
-                            <button class="mt-1 btn btn-success" >Создать</button>                        
-                            <button class="mt-1 btn btn-danger"  input type="button" data-toggle="modal" data-target="#deletemodal">Удалить</button>      
+                            
                         
                     </div>
                 </div>
@@ -235,7 +233,11 @@
             </div>
         </div>
     </div>
-
+    <div class="card-body">
+        <button class="mt-1 btn btn-primary" input type="submit">Записать</button>
+        <button class="mt-1 btn btn-success" >Создать</button>                        
+        <button class="mt-1 btn btn-danger"  input type="button" data-toggle="modal" data-target="#deletemodal">Удалить</button>  
+    </div>    
 </div>
     
 </form>
@@ -288,8 +290,9 @@
 
 {% if notexists %}
 <script type="text/javascript">
+
   alert('Нет данных по запросу')
-  window.history.back
+  window.history.back()
 
   $("#notexistsmodal").modal('show');
 </script>
