@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.generic.edit import UpdateView, DeleteView, ProcessFormView
 from django.views.generic.list import ListView
-from catalog.models import good, category, company, subcategory1, subcategory2, subcategory3
+from catalog.models import good, category, company, subcategory1, subcategory2, subcategory3, kit_interface, interface
 from catalog.forms import GoodForm
 from django.urls import path
 #Контроллер-класс по выводу страницы с номенклатурой
@@ -11,7 +11,7 @@ class good_detail(UpdateView, ListView):
     form_class = GoodForm
     template_name = "catalog_home.html"
     pk_url_kwarg = "no"
-    success_url = './'
+    #success_url = './'
     paginate_by = 10
     cat_no = None
     scat1_no =None
@@ -19,12 +19,14 @@ class good_detail(UpdateView, ListView):
     scat3_no = None
     no = None
     notexists = None
+
     
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)  
         context['cats'] = category.objects.all().order_by("name")
         context['companies'] =  company.objects.all().order_by("name")
+        context['interface'] =  interface.objects.all().order_by("name")
        # Переменная - нет данных
         context['notexists'] = self.notexists
         return context
@@ -44,50 +46,73 @@ class good_detail(UpdateView, ListView):
                         self.cat_no = category.objects.get(pk = self.kwargs["cat"])   
                     except:
                         self.cat_no = None
-           
-          #Проверка есть ли в контексте номер товара, если нет добавляет первый из сета
+        g_n = None
+        # Флаг пустой или не пустой сет
+        empty_set = False
         try:
             g_n=self.kwargs["no"]
         except:
-            try:
             #Если ошибка в первом элементе сета, значит набор пустой, вывести модальное окно
-                if self.scat3_no != None:
+            if self.scat3_no != None:
+                try:
+                    #Проверка есть ли в контексте номер товара, если нет добавляет первый из сета
                     g_n=good.objects.filter(subcategory3 = self.scat3_no).first().no
-                elif self.scat2_no != None:
+                except:
+                     empty_set = True
+            elif self.scat2_no != None:
+                try:
                     g_n=good.objects.filter(subcategory2 = self.scat2_no).first().no
-                elif self.scat1_no != None:
+                except:
+                    empty_set = True
+            elif self.scat1_no != None:
+                try:
                     g_n=good.objects.filter(subcategory1 = self.scat1_no).first().no
-                elif self.cat_no != None:
+                except:
+                    empty_set = True
+            elif self.cat_no != None:
+                try:
                     g_n=good.objects.filter(good_category = self.cat_no).first().no
-                else:
-                    g_n=good.objects.first().no
-            except:
+                except:
+                    empty_set = True
+            else:
+                g_n=good.objects.first().no
+            if empty_set:
                 self.notexists = True 
-                g_n=good.objects.first().no  
+                g_n=good.objects.first().no
         self.kwargs["no"]=g_n
         self.no=g_n
-        return super(good_detail, self).get( *args, **kwargs)
- 
-    def post(self, *args, **kwargs):
-       #Запись в переменную выбранной категории/подкатегории
-        try:
-            self.scat3_no = subcategory3.objects.get(pk = self.kwargs["scat3"])
-        except:
+        #Заполняет в форме начальными значениями поля интерфейсов
+        field_count=0
+        for intr in interface.objects.all():
+            g=good.objects.get(pk=g_n)
             try:
-                self.scat2_no= subcategory2.objects.get(pk = self.kwargs["scat2"])        
+                ki = kit_interface.objects.get(good=g, interface=intr)   
+                field_count=ki.count
+            except:
+                field_count = 0
+            self.initial.update({intr.name:field_count})
+
+        return super(good_detail, self).get( *args, **kwargs)
+    #Запись изменений
+    def post(self, request, *args, **kwargs):
+        if self.form_valid:
+        #Запись в переменную выбранной категории/подкатегории
+            try:
+                self.scat3_no = subcategory3.objects.get(pk = self.kwargs["scat3"])
             except:
                 try:
-                    self.scat1_no = subcategory1.objects.get(pk = self.kwargs["scat1"])    
+                    self.scat2_no= subcategory2.objects.get(pk = self.kwargs["scat2"])        
                 except:
                     try:
-                        self.cat_no = category.objects.get(pk = self.kwargs["cat"])  
+                        self.scat1_no = subcategory1.objects.get(pk = self.kwargs["scat1"])    
                     except:
-                        self.cat_no = None
-      
-          #Проверка есть ли в контексте номер товара, если нет добавляет первый из сета
-        try:
-            g_n=self.kwargs["no"]
-        except:
+                        try:
+                            self.cat_no = category.objects.get(pk = self.kwargs["cat"])  
+                        except:
+                            self.cat_no = None
+            ids=0
+            ids_name=''
+            #Проверка есть ли в контексте номер товара, если нет добавляет первый из сета
             try:
             #Если категория не пуста, значит сформировать сэт и URL для перенаправления
                 if self.scat3_no != None:
@@ -114,31 +139,50 @@ class good_detail(UpdateView, ListView):
                     g_n=good.objects.first().no
             except:
                 g_n=good.objects.first().no  
-        if ids==0:
-            self.success_url = reverse("catalog:catalog")
-        else:
-            self.success_url = reverse(revers_url, kwargs={ids_name: ids})
-        self.kwargs["no"]=g_n
-    
-        return super(good_detail, self).post( *args, **kwargs)
+            # Проверка есть ли в контексте номер товара и формирование реверс-url
+            try:
+                g_n=self.kwargs["no"]
+                self.success_url = reverse(revers_url+'_good', kwargs={ids_name: ids, 'no': g_n})
+            except:
+                self.kwargs["no"]=g_n
+                if ids==0:
+                    self.success_url = reverse("catalog:catalog")
+                else:
+                    self.success_url = reverse(revers_url, kwargs={ids_name: ids})
+            #Запись значений количества интерфейсов, если интерфейса не было создается
+            for s in interface.objects.all():
+                g=good.objects.get(pk=g_n)
+                try:
+                    val=self.get_form()[s.name].value()
+                    ki = kit_interface.objects.get(good=g, interface=s)
+                    ki.count = val
+                    ki.save()
+                except:
+                    if val != None or val!= 0:
+                        kit_interface.objects.create(good = g, interface = s, count =val)
+         
+        return super(good_detail, self).post( request, *args, **kwargs)
 
     def get_queryset(self):
+        qs=None
         #Проверяет записана ли какая то категория/подкатегория и если да, то создает сет с выбранной категорией
+       
         if self.scat3_no!= None:
             qs = good.objects.filter(subcategory3 = self.scat3_no)
         elif self.scat2_no != None:
             qs = good.objects.filter(subcategory2 = self.scat2_no)
         elif self.scat1_no != None:
             qs = good.objects.filter(subcategory1 = self.scat1_no)
-        else:
-            qs = good.objects.filter(good_category = self.cat_no)      
-        if qs.exists():
+        elif self.cat_no != None:
+            qs = good.objects.filter(good_category = self.cat_no)    
+        if qs!=None and qs.exists():
             return qs
         else:
             return good.objects.all()
             self.notexists = True
+     
 
-        
+
 #Класс для удаления записи
 class good_delete(DeleteView):
     model = good

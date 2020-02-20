@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib import admin
 power_types = {
 	(1, "AC"),
-	(2, "DC")
+	(2, "DC"),
+	(3, "AC/DC")
 }
 
 from django.db import models
@@ -194,17 +195,17 @@ class good (models.Model):
 	part_no = models.CharField(verbose_name = "Заводской номер", unique = True, db_index = True, max_length = 100, blank = True, null = True)
 	description = models.TextField(verbose_name = "Описание", blank = True, null = True)
 	unit = models.ForeignKey(unit, verbose_name = "Единица измерения", blank = True, null = True, on_delete = models.SET_NULL)
-	purchase_price_wo_vat = models.FloatField(verbose_name = "Закупочная цена, без НДС", db_index = True, blank = True, null = True)
-	purchase_price_w_vat = models.FloatField(verbose_name = "Закупочная цена, с НДС", db_index = True, blank = True, null = True)
-	rrp_wo_vat = models.FloatField(verbose_name = "Розница, без НДС", db_index = True, blank = True, null = True)
-	rrp_price_w_vat = models.FloatField(verbose_name = "Розница, с НДС", db_index = True, blank = True, null = True)
-	discount_standart = models.FloatField(verbose_name = "Скидка стандартная", blank = True, null = True)
-	discount_max = models.FloatField(verbose_name = "Скидка максимальная", blank = True, null = True)
-	multiplayer_standart = models.FloatField(verbose_name = "Наценка стандартная", blank = True, null = True)
-	multiplayer_min = models.FloatField(verbose_name = "Наценка минимальная", blank = True, null = True)
-	profit_rrp = models.FloatField(verbose_name = "Прибыль от розницы", db_index = True, blank = True, null = True)
-	profit_standart = models.FloatField(verbose_name = "Прибыль при стандартной скидке", db_index = True, blank = True, null = True)
-	profit_min = models.FloatField(verbose_name = "Прибыль при максимальной скидке", db_index = True, blank = True, null = True)
+	purchase_price_wo_vat = models.DecimalField(verbose_name = "Закупочная цена, без НДС",  max_digits = 50, decimal_places = 2, db_index = True, blank = True, null = True)
+	purchase_price_w_vat = models.DecimalField(verbose_name = "Закупочная цена, с НДС",  max_digits = 50,   decimal_places = 2, db_index = True, blank = True, null = True)
+	rrp_wo_vat = models.DecimalField(verbose_name = "Розница, без НДС",  max_digits = 50,  decimal_places = 2, db_index = True, blank = True, null = True)
+	rrp_price_w_vat = models.DecimalField(verbose_name = "Розница, с НДС",  max_digits = 50,  decimal_places = 2, db_index = True, blank = True, null = True)
+	discount_standart = models.DecimalField(verbose_name = "Скидка стандартная",  max_digits = 50,  decimal_places = 2, blank = True, null = True)
+	discount_max = models.DecimalField(verbose_name = "Скидка максимальная",  max_digits = 50,  decimal_places = 2, blank = True, null = True)
+	multiplayer_standart = models.DecimalField(verbose_name = "Наценка стандартная",  max_digits = 50,  decimal_places = 2, blank = True, null = True)
+	multiplayer_min = models.DecimalField(verbose_name = "Наценка минимальная",  max_digits = 50,  decimal_places = 2, blank = True, null = True)
+	profit_rrp = models.DecimalField(verbose_name = "Прибыль от розницы", max_digits = 50,   decimal_places = 2, db_index = True, blank = True, null = True)
+	profit_standart = models.DecimalField(verbose_name = "Прибыль при стандартной скидке",  max_digits = 50,  decimal_places = 2, db_index = True, blank = True, null = True)
+	profit_min = models.DecimalField(verbose_name = "Прибыль при максимальной скидке", max_digits = 50,   decimal_places = 2, db_index = True, blank = True, null = True)
 	producer = models.ForeignKey(company, verbose_name = "Производитель", db_index = True, blank = True, null = True, on_delete = models.SET_NULL, related_name = 'PRODUCER')
 	suplayer = models.ForeignKey(company, verbose_name = "Поставщик", db_index = True, blank = True, null = True, on_delete = models.SET_NULL, related_name = '+')
 	good_category = models.ForeignKey(category, verbose_name = "Категория", blank = True, null = True, on_delete = models.SET_NULL, related_name = 'CATEGORY')
@@ -218,9 +219,9 @@ class good (models.Model):
 	picture = models.ImageField(verbose_name = "Изображение", blank = True, null = True)
 	schematic = models.FileField(verbose_name = "Схема", blank = True, null = True)
 	svg = models.FileField(verbose_name = "svg", blank = True, null = True)
-	installation_time = models.FloatField(verbose_name = "Время на монтаж", blank = True, null = True)
-	programming_time = models.FloatField(verbose_name = "Время на программирование", blank = True, null = True)
-	comission_time = models.FloatField(verbose_name = "Время на пуско - наладку", blank = True, null = True)
+	installation_time = models.DecimalField(verbose_name = "Время на монтаж",  max_digits = 50,   decimal_places = 2,blank = True, null = True)
+	programming_time = models.DecimalField(verbose_name = "Время на программирование",   max_digits = 50,  decimal_places = 2,blank = True, null = True)
+	comission_time = models.DecimalField(verbose_name = "Время на пуско - наладку",  max_digits = 50,  decimal_places = 2, blank = True, null = True)
 	plc_DI = models.IntegerField(verbose_name = "Количество цифровых входов", blank = True, null = True)
 	plc_DO = models.IntegerField(verbose_name = "Количество цифровых выходов", blank = True, null = True)
 	plc_AI = models.IntegerField(verbose_name = "Количество аналоговых входов", blank = True, null = True)
@@ -267,11 +268,17 @@ class kit_control_interface (models.Model):
 	good = models.ForeignKey(good,  on_delete = models.CASCADE)
 	control_interface = models.ForeignKey(control_interface,  on_delete = models.CASCADE)
 	count = models.IntegerField (verbose_name = "Количество", blank = True, null = True)
+	def __str__(self):
+		return ""
 	class Meta:
-		verbose_name_plural = "Подключения"
-		verbose_name = "Подключение"
+		verbose_name_plural = "Физический интерфейсы"
+		verbose_name = "Физические интерфейсы"
 
 # класс для отображения в админке поля многие ко многим
 class kit_interfaceInLine(admin.StackedInline):
 	model= kit_interface
+	extra = 1
+# класс для отображения в админке поля многие ко многим
+class kit_control_interfaceInLine(admin.StackedInline):
+	model= kit_control_interface 
 	extra = 1

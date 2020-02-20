@@ -16,6 +16,7 @@
                             {{cat.name}}
                             <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                         </a>
+                        
                         <ul> 
                             {% for c in cat.CAT.all %}
                             {% if c.no == view.kwargs.scat1 %}  
@@ -25,7 +26,7 @@
                              {% endif %} 
                                 <a href="{% url 'catalog:scat1' c.no %}">
                                     <i class="metismenu-icon"></i>
-                                    {{c.name}}
+                                    {{c.name }}
                                     <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                                 </a>
                                 <ul> 
@@ -94,6 +95,7 @@
                     <th>#</th>
                     <th> Наименование</th>
                     <th>Зав. №</th>
+                    <th>Цена</th>
                     <th>Производитель</th>
                     <th>Описание</th>
                 </tr>
@@ -117,6 +119,7 @@
                         <td><a href= "{% url 'catalog:category_good' cat=good.good_category_id  no=good.no %}">{{good.name}} </a></td>
                     {% endif %}
                     <td>{{good.part_no}}</td>
+                    <td>{{good.rrp_price_w_vat }}</td>
                     <td><a href= "#">{{good.producer}} </a></td>
                     <td>{{good.description}}</td>
                 </tr>
@@ -178,7 +181,17 @@
      </li>
      <li class="nav-item">
         <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#tab-content-4">
+            <span>PLC</span>
+        </a>
+    </li>
+     <li class="nav-item">
+        <a role="tab" class="nav-link" id="tab-5" data-toggle="tab" href="#tab-content-5">
             <span>Дополнительно</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a role="tab" class="nav-link" id="tab-6" data-toggle="tab" href="#tab-content-6">
+            <span>Интерфейсы</span>
         </a>
     </li>
  </ul>
@@ -201,9 +214,6 @@
                             <div class="position-relative form-group"><label for="part_no" class="">{{ form.part_no.label }}</label> {{ form.part_no }}</div>
                             <div class="position-relative form-group"><label for="description" class="">{{ form.description.label }}</label> {{ form.description }}</div>
                             <div class="position-relative form-group"><label for="producer" class="">{{ form.producer.label }}</label> {{ form.producer }}</div>
-                            <div class="position-relative form-group"><label for="price" class="">{{ form.rrp_price_w_vat.label }}</label> {{ form.rrp_price_w_vat }}</div>
-                            
-                        
                     </div>
                 </div>
             </div>
@@ -218,16 +228,91 @@
                            <div class="position-relative form-group"><label for="part_no" class="">{{ form.subcategory1.label }}</label> {{ form.subcategory1}}</div>
                            <div class="position-relative form-group"><label for="description" class="">{{ form.subcategory2.label }}</label> {{ form.subcategory2 }}</div>
                            <div class="position-relative form-group"><label for="producer" class="">{{ form.subcategory3.label }}</label> {{ form.subcategory3 }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.good_family.label }}</label> {{ form.good_family }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.subfamily.label }}</label> {{ form.subfamily }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.suplayer.label }}</label> {{ form.suplayer }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.delivery_time.label }}</label> {{ form.delivery_time }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.installation_time.label }}</label> {{ form.installation_time }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.programming_time.label }}</label> {{ form.programming_time }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.comission_time.label }}</label> {{ form.comission_time  }}</div>
-                           <div class="position-relative form-group"><label for="price" class="">{{ form.in_stock.label }}</label> {{ form.in_stock }}</div>
-                          
-                        
+                           <div class="position-relative form-group"><label for="good_family" class="">{{ form.good_family.label }}</label> {{ form.good_family }}</div>
+                           <div class="position-relative form-group"><label for="subfamily" class="">{{ form.subfamily.label }}</label> {{ form.subfamily }}</div>
+                           <div class="position-relative form-group"><label for="suplayer" class="">{{ form.suplayer.label }}</label> {{ form.suplayer }}</div>
+                           <div class="position-relative form-group"><label for="delivery_time" class="">{{ form.delivery_time.label }}</label> {{ form.delivery_time }}</div>
+                           <div class="position-relative form-group"><label for="installation_time" class="">{{ form.installation_time.label }}</label> {{ form.installation_time }}</div>
+                           <div class="position-relative form-group"><label for="programming_time" class="">{{ form.programming_time.label }}</label> {{ form.programming_time }}</div>
+                           <div class="position-relative form-group"><label for="comission_time" class="">{{ form.comission_time.label }}</label> {{ form.comission_time  }}</div>
+                           <div class="position-relative form-group"><label for="in_stock" class="">{{ form.in_stock.label }}</label> {{ form.in_stock }}</div> 
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-2" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                           <div class="position-relative form-group"><label for="purchase_price_wo_vat" class="">{{ form.purchase_price_wo_vat.label }}</label> {{ form.purchase_price_wo_vat }}</div>
+                           <div class="position-relative form-group"><label for="purchase_price_w_vat" class="">{{ form.purchase_price_w_vat.label }}</label> {{ form.purchase_price_w_vat}}</div>
+                           <div class="position-relative form-group"><label for="rrp_wo_vat" class="">{{ form.rrp_wo_vat.label }}</label> {{ form.rrp_wo_vat }}</div>
+                           <div class="position-relative form-group"><label for="rrp_price_w_vat" class="">{{ form.rrp_price_w_vat.label }}</label> {{ form.rrp_price_w_vat }}</div>
+                           <div class="position-relative form-group"><label for="discount_standart" class="">{{ form.discount_standart.label }}</label> {{ form.discount_standart }}</div>
+                           <div class="position-relative form-group"><label for="discount_max" class="">{{ form.discount_max.label }}</label> {{ form.discount_max }}</div>
+                           <div class="position-relative form-group"><label for="multiplayer_standart" class="">{{ form.multiplayer_standart.label }}</label> {{ form.multiplayer_standart }}</div>
+                           <div class="position-relative form-group"><label for="multiplayer_min" class="">{{ form.multiplayer_min.label }}</label> {{ form.multiplayer_min}}</div>
+                           <div class="position-relative form-group"><label for="profit_rrp" class="">{{ form.profit_rrp.label }}</label> {{ form.profit_rrp }}</div>
+                           <div class="position-relative form-group"><label for="profit_standart" class="">{{ form.profit_standart.label }}</label> {{ form.profit_standart }}</div>
+                           <div class="position-relative form-group"><label for="profit_min" class="">{{ form.profit_min.label }}</label> {{ form.profit_min  }}</div>   
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-3" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                           <div class="position-relative form-group"><label for="power_type" class="">{{ form.power_type.label }}</label> {{ form.power_type }}</div>
+                           <div class="position-relative form-group"><label for="in_box" class="">{{ form.in_box.label }}</label> {{ form.in_box}}</div>
+                           <div class="position-relative form-group"><label for="accessories" class="">{{ form.accessories.label }}</label> {{ form.accessories}}</div>
+                           <div class="position-relative form-group"><label for="network_interfaces" class="">{{ form.network_interfaces.label }}</label> {{ form.network_interfaces }}</div>
+                           
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-4" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                           
+                           
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-5" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                           
+                           
+                    </div>     
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane tabs-animation fade" id="tab-content-6" role="tabpanel">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        {% for ints in interface %}
+                        {% for field in form %}
+                        {% if field.name == ints.name%}
+                           <div class="position-relative form-group"><label class="" >{{ ints.name }}</label> {{ field }}</div>
+                           {% endif%}
+                           {%endfor%}  
+                        {%endfor%}  
                     </div>     
                 </div>
             </div>
